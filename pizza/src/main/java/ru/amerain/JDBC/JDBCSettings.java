@@ -11,16 +11,15 @@ import com.mysql.fabric.jdbc.FabricMySQLDriver;
  */
 public class JDBCSettings {
     private Connection connection;
-    private Driver driver;
+  //  private Driver driver;
 
-    public  JDBCSettings()throws SQLException{
-        driver = new FabricMySQLDriver();
-        DriverManager.registerDriver(driver);
+    public  JDBCSettings() throws SQLException, ClassNotFoundException {
+        Class.forName("com.mysql.jdbc.Driver");
     }
     public Connection getConnection(String url,String username,String password) throws SQLException {
         if(connection!=null)
             return connection;
-        connection = DriverManager.getConnection(url,username,password);
+        connection = DriverManager.getConnection(url, username, password);
     return connection;
     }
 }

@@ -53,13 +53,13 @@ public class ToClientTable {
             return resultSet;
         else return null;
     }
-    public int SELECTID() throws SQLException {
-        statement = connection.prepareStatement("SELECT * FROM pizzas_delivery.clients order by clients.ID DESC LIMIT 1");
-        ResultSet rs = statement.executeQuery();
-        rs.next();
-        return rs.getInt(1);//next
-
-    }
+//    public int SELECTID() throws SQLException {
+//        statement = connection.prepareStatement("SELECT * FROM pizzas_delivery.clients order by clients.ID DESC LIMIT 1");
+//        ResultSet rs = statement.executeQuery();
+//        rs.next();
+//        return rs.getInt(1);//next
+//
+//    }
     public int SELECTID(Client client) throws SQLException {
 
         ResultSet rs = SELECT(client);

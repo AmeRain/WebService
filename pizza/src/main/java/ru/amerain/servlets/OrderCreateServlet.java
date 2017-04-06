@@ -1,10 +1,7 @@
 package ru.amerain.servlets;
 
 import com.mysql.fabric.jdbc.FabricMySQLDriver;
-import ru.amerain.JDBC.JDBCSettings;
-import ru.amerain.JDBC.ToClientTable;
-import ru.amerain.JDBC.ToOrderTable;
-import ru.amerain.JDBC.ToOrderedProductsTable;
+import ru.amerain.JDBC.*;
 import ru.amerain.models.Client;
 import ru.amerain.models.Order;
 import ru.amerain.store.OrderCache;
@@ -31,51 +28,67 @@ public class OrderCreateServlet extends HttpServlet {
     private   static final String user="root";
     private   static final String password="rain060896";
     private   static final String url="jdbc:mysql://localhost:3306/mysql?useSSL=false";
-    private static Connection connection;
-    private static Statement stmt;
-    private static ResultSet rs;
+    private   static Connection connection;
+    private   JDBCSettings settings;
+    QueryByTables query;
     public void init(ServletConfig serConf) throws ServletException{
-        try{
-            // Driver driver = new FabricMySQLDriver();
-            //  DriverManager.registerDriver(driver);
-            Class.forName("com.mysql.jdbc.Driver");
-            // opening database connection to MySQL server
-            connection = DriverManager.getConnection(url, user, password);
-        } catch (SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+//        try{
+//            // Driver driver = new FabricMySQLDriver();
+//            //  DriverManager.registerDriver(driver);
+//            Class.forName("com.mysql.jdbc.Driver");
+//            // opening database connection to MySQL server
+//            connection = DriverManager.getConnection(url, user, password);
+//        } catch (SQLException sqlEx) {
+//            sqlEx.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+      //  JDBCSettings con = null;
+        try {
+             settings = new JDBCSettings();
+            connection = settings.getConnection(url,user,password);
+            query = new QueryByTables(connection);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
         response.setCharacterEncoding("UTF-8");
         request.setCharacterEncoding("UTF-8");
         try {
+
             Client client = new Client
                     (request.getParameter("full_name"),request.getParameter("phone_number"));
-            ToClientTable clientTable = new ToClientTable(connection);
+          //  ToClientTable clientTable = new ToClientTable(connection);
 
-            if(clientTable.SELECT(client)==null)
-                clientTable.INSERT(client);
-            client.setID(clientTable.SELECTID(client));
+//            if(clientTable.SELECT(client)==null)
+//                clientTable.INSERT(client);
+//            client.setID(clientTable.SELECTID(client));
+            query.PushClient(client);
 
             String[] arrrayProduct = request.getParameterValues("product");
             String[] arrayCountProduct = request.getParameterValues("count");
+
             Order order = new Order
                     (client,request.getParameter("client_place"),request.getParameter("date"),
                             arrrayProduct,arrayCountProduct);
+            query.PushOrder(order);
+            query.PushOrderedProducts(order);
+           // ToOrderTable orderTable = new ToOrderTable(connection);
+//            orderTable.INSERT(order);
+//            //засовываю заказ в таблицу заказы
+//            order.setID(orderTable.SELECTID());
 
-            ToOrderTable orderTable = new ToOrderTable(connection);
-            orderTable.INSERT(order);
-            //засовываю заказ в таблицу заказы
-            order.setID(orderTable.SELECTID());
-
-            ToOrderedProductsTable toOrderedProductsTable = new ToOrderedProductsTable(connection);
-            toOrderedProductsTable.INSERT(order);
+         //   ToOrderedProductsTable toOrderedProductsTable = new ToOrderedProductsTable(connection);
+         //   toOrderedProductsTable.INSERT(order);
 
     } catch (SQLException e) {
         e.printStackTrace();
