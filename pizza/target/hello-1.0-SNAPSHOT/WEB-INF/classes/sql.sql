@@ -1,0 +1,1 @@
+SELECT * FROM pizzas_delivery.orders;
